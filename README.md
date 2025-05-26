@@ -22,10 +22,16 @@ Este é um projeto que implementa o clássico problema do Jantar dos Filósofos 
 
 ## 📋 Pré-requisitos
 
+**Para desenvolvimento local (sem Docker):**
 - Windows 10 ou superior
-- Docker Desktop (configurado para usar Windows Containers)
-- Visual Studio 2019 ou superior (opcional, para desenvolvimento fora do VS Code)
-- O .NET Framework 4.8 SDK é fornecido pelo ambiente de desenvolvimento no container.
+- .NET Framework 4.7.2 SDK (ou superior, como o 4.8 SDK). Você pode baixá-lo [aqui](https://dotnet.microsoft.com/download/dotnet-framework).
+- MSBuild (geralmente incluído com o .NET Framework SDK ou Visual Studio).
+- Visual Studio 2019 ou superior (opcional, mas útil para gerenciamento de dependências e build) OU VS Code com a extensão C# da Microsoft.
+
+**Para desenvolvimento com VS Code Dev Container:**
+- Windows 10 ou superior
+- Docker Desktop (configurado para usar Windows Containers).
+- (O .NET Framework 4.8 SDK é fornecido pelo ambiente de desenvolvimento no container).
 
 ## �� Como Executar
 
@@ -108,6 +114,47 @@ git clone https://github.com/seu-usuario/Jantar-dos-Filosofos.git
     *   Após a recompilação, execute o aplicativo novamente conforme o passo 9.
 
 O Dev Container executa um ambiente Windows com o .NET Framework necessário, isolando as dependências do projeto.
+
+### Usando VSCode Localmente (Sem Docker)
+
+Se preferir não usar o ambiente de container Docker, você pode configurar e executar o projeto localmente no VSCode seguindo estes passos:
+
+1.  **Instale os Pré-requisitos Locais:**
+    *   Certifique-se de ter o [.NET Framework 4.7.2 SDK](https://dotnet.microsoft.com/download/dotnet-framework) (ou uma versão compatível como 4.8) instalado em seu sistema Windows.
+    *   Instale o [Visual Studio Code](https://code.visualstudio.com/).
+    *   Instale a extensão [C# for Visual Studio Code (powered by OmniSharp)](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csharp) no VSCode.
+
+2.  **Clone o Repositório:**
+    ```bash
+    git clone https://github.com/seu-usuario/Jantar-dos-Filosofos.git
+    cd Jantar-dos-Filosofos
+    ```
+    *(Substitua `seu-usuario` pelo nome de usuário correto, se aplicável.)*
+
+3.  **Abra a Pasta no VSCode:**
+    ```bash
+    code .
+    ```
+
+4.  **Compile o Projeto:**
+    *   Abra o terminal integrado no VSCode (`Ctrl+\` ou `View > Terminal`).
+    *   Use o MSBuild para compilar a solução. Você pode precisar encontrar o caminho para `MSBuild.exe` se ele não estiver no PATH. Caminhos comuns incluem:
+        *   `C:\Program Files (x86)\Microsoft Visual Studio\<Ano>\<Edição>\MSBuild\Current\Bin\MSBuild.exe` (Ex: `C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe`)
+        *   `C:\Windows\Microsoft.NET\Framework\v4.0.30319\MSBuild.exe` (para .NET Framework 4.x)
+    *   Exemplo de comando de build (ajuste o caminho do MSBuild conforme necessário):
+        ```powershell
+        & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe" "Jantar dos Filosofos.sln" /p:Configuration=Release
+        ```
+    *   Alternativamente, o VSCode com a extensão C# pode oferecer tarefas de build (procure por "Run Build Task" na paleta de comandos `Ctrl+Shift+P`).
+
+5.  **Execute o Projeto:**
+    *   Após a compilação bem-sucedida, o executável estará na pasta `bin\Release` (ou `bin\Debug` se compilado em modo Debug).
+    *   Execute o arquivo `.exe` diretamente (o nome exato é definido no arquivo `.csproj`, neste caso `JantarDosFilosofosNet.exe`):
+        ```powershell
+        .\bin\Release\JantarDosFilosofosNet.exe
+        ```
+
+> **Nota:** Como este é um projeto Windows Forms, ele precisa ser executado em um ambiente Windows com o .NET Framework correspondente instalado.
 
 ## 🎮 Como Usar
 
