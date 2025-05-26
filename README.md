@@ -23,30 +23,11 @@ Este é um projeto que implementa o clássico problema do Jantar dos Filósofos 
 ## 📋 Pré-requisitos
 
 - Windows 10 ou superior
-- .NET Framework 4.7.2 ou superior
-- Visual Studio 2019 ou superior (para desenvolvimento)
+- Docker Desktop (configurado para usar Windows Containers)
+- Visual Studio 2019 ou superior (opcional, para desenvolvimento fora do VS Code)
+- O .NET Framework 4.8 SDK é fornecido pelo ambiente de desenvolvimento no container.
 
 ## �� Como Executar
-
-### Comandos Rápidos
-
-Para executar o projeto diretamente, use os seguintes comandos:
-
-```bash
-# Clonar o repositório
-git clone https://github.com/seu-usuario/Jantar-dos-Filosofos.git
-
-# Entrar na pasta do projeto
-cd Jantar-dos-Filosofos
-
-# Compilar o projeto
-dotnet build
-
-# Executar o projeto
-dotnet run
-```
-
-> **Importante**: Certifique-se de ter o .NET Framework 4.7.2 instalado no seu sistema Windows.
 
 ### Usando Visual Studio
 
@@ -61,42 +42,72 @@ git clone https://github.com/seu-usuario/Jantar-dos-Filosofos.git
 
 4. Execute o projeto (F5 ou Debug > Start Debugging)
 
-### Usando VSCode
+### Usando VSCode com Dev Container (Recomendado)
 
-1. Clone o repositório:
-```bash
-git clone https://github.com/seu-usuario/Jantar-dos-Filosofos.git
-```
+1.  **Certifique-se de que o Docker Desktop está instalado, em execução e configurado para usar 'Windows containers'.**
+    *   Você pode verificar isso clicando com o botão direito no ícone do Docker na bandeja do sistema e selecionando "Switch to Windows containers..." (se estiver mostrando "Switch to Linux containers...", você já está no modo Windows).
 
-2. Instale as extensões necessárias no VSCode:
-   - C# (Microsoft)
-   - C# Extensions
-   - .NET Core Tools
+2.  **Clone o repositório:**
+    ```bash
+    git clone https://github.com/seu-usuario/Jantar-dos-Filosofos.git
+    ```
+    *Substitua `seu-usuario` pelo nome de usuário correto, se aplicável.*
 
-3. Abra a pasta do projeto no VSCode:
-```bash
-code Jantar-dos-Filosofos
-```
+3.  **Abra a pasta do projeto no VSCode.**
 
-4. Instale o .NET SDK se ainda não tiver:
-   - Baixe do site oficial: https://dotnet.microsoft.com/download
+4.  **Reabrir no Container:**
+    *   O VSCode deve detectar automaticamente a configuração do Dev Container (`.devcontainer/devcontainer.json`).
+    *   Clique em "**Reopen in Container**" quando solicitado na notificação no canto inferior direito.
+    *   Se você não vir a notificação, abra a Paleta de Comandos (`Ctrl+Shift+P` ou `Cmd+Shift+P` no macOS) e procure por "**Remote-Containers: Reopen in Container**".
 
-5. Restaure as dependências:
-```bash
-dotnet restore
-```
+5.  **Aguarde o Build da Imagem:**
+    *   Aguarde o build da imagem Docker e a inicialização do container. Isso pode levar alguns minutos na primeira vez, pois o Docker precisará baixar a imagem base do Windows Server Core e executar os passos de configuração definidos no `Dockerfile`.
 
-6. Compile o projeto:
-```bash
-dotnet build
-```
+6.  **Conectar via RDP (Remote Desktop Protocol):**
+    *   Após o container iniciar e o VSCode se conectar a ele, você precisará se conectar à interface gráfica do Windows dentro do container usando um cliente RDP.
+    *   Abra o aplicativo "**Conexão de Área de Trabalho Remota**" (Remote Desktop Connection) no seu Windows (geralmente encontrado pesquisando "mstsc" no menu Iniciar).
+    *   No campo "Computador", digite: `localhost:3389`
+        *   A porta `3389` é encaminhada do container para o seu host conforme definido em `.devcontainer/devcontainer.json`.
+    *   Clique em "Conectar".
 
-7. Execute o projeto:
-```bash
-dotnet run
-```
+7.  **Login no Container:**
+    *   Quando solicitado o login, use as seguintes credenciais:
+        *   Usuário: `ContainerAdministrator`
+        *   Senha: `AdminP@ssw0rd!` (esta é a senha configurada no `Dockerfile`)
+    *   Você pode ser solicitado a confirmar o certificado do computador remoto; aceite para continuar.
 
-> **Nota**: Como este é um projeto Windows Forms, você precisará ter o .NET Framework instalado no Windows para executá-lo, mesmo usando o VSCode.
+8.  **Dentro da Sessão RDP:**
+    *   Você agora está visualizando e controlando o ambiente desktop do Windows Server Core dentro do container.
+    *   Abra o **PowerShell** ou o **Prompt de Comando (CMD)**. Você pode encontrá-los no Menu Iniciar dentro da sessão RDP.
+    *   Navegue até o diretório de trabalho do projeto:
+        ```powershell
+        cd C:\app
+        ```
+        *(Este é o `WORKDIR` definido no `Dockerfile`)*.
+
+9.  **Executar o Projeto:**
+    *   O projeto já foi compilado durante o processo de build da imagem Docker (devido ao comando `RUN msbuild ...` no `Dockerfile`).
+    *   Para executar a aplicação Windows Forms, navegue até a pasta de saída e execute o arquivo `.exe`. O nome exato do executável pode variar com base no nome do projeto (ex: `JantarDosFilosofosNet.exe`). Assumindo que o nome do projeto é "Jantar dos Filosofos" e o assembly name é "JantarDosFilosofosNet":
+        ```powershell
+        .\bin\Release\JantarDosFilosofosNet.exe
+        ```
+        *Verifique o nome correto do arquivo `.exe` na pasta `C:\app\bin\Release` se necessário.*
+
+10. **Recompilar o Projeto (Após Alterações no Código):**
+    *   Se você fizer alterações no código-fonte (arquivos `.cs`, `.resx`, etc.) usando o VSCode (que está editando os arquivos dentro do container), você precisará recompilar o projeto.
+    *   Você pode fazer isso de duas maneiras:
+        *   **No terminal integrado do VSCode** (que já está conectado ao container):
+          ```powershell
+          msbuild "Jantar dos Filosofos.sln" /p:Configuration=Release
+          ```
+          *(Certifique-se de estar no diretório `C:\app` no terminal do VSCode).*
+        *   **No PowerShell ou CMD dentro da sessão RDP** (no diretório `C:\app`):
+          ```powershell
+          msbuild "Jantar dos Filosofos.sln" /p:Configuration=Release
+          ```
+    *   Após a recompilação, execute o aplicativo novamente conforme o passo 9.
+
+O Dev Container executa um ambiente Windows com o .NET Framework necessário, isolando as dependências do projeto.
 
 ## 🎮 Como Usar
 

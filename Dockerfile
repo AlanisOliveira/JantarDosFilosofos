@@ -1,9 +1,12 @@
-FROM mcr.microsoft.com/dotnet/framework/wcf:4.7.2-windowsservercore-ltsc2019
+# Use a .NET Framework SDK image that supports RDP or can have it enabled
+FROM mcr.microsoft.com/dotnet/framework/sdk:4.8-windowsservercore-ltsc2019
 
+# Set up RDP
+# Note: The user 'ContainerAdministrator' is the default user in this base image.
 RUN powershell -Command \
-    Invoke-WebRequest -Uri https://go.microsoft.com/fwlink/?LinkId=863262 -OutFile dotnet-framework-installer.exe; \
-    .\dotnet-framework-installer.exe /quiet /install; \
-    Remove-Item -Force dotnet-framework-installer.exe
+    Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -Value 0; \
+    Enable-NetFirewallRule -DisplayGroup "Remote Desktop"; \
+    net user ContainerAdministrator "AdminP@ssw0rd!"
 
 WORKDIR /app
 
@@ -11,6 +14,8 @@ COPY . .
 
 RUN msbuild "Jantar dos Filosofos.sln" /p:Configuration=Release
 
-ENV DISPLAY=host.docker.internal:0.0
+EXPOSE 3389
 
-ENTRYPOINT ["Jantar dos Filosofos.exe"] 
+# Keep container running for RDP.
+# Start Remote Desktop Service and then open PowerShell to keep the container alive.
+CMD powershell -NoProfile -Command "Start-Service TermService; powershell"
